@@ -1,0 +1,25 @@
+# http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+BasedOnStyle: Chromium
+
+ColumnLimit: 100
+
+IndentWidth: 2
+ObjCBlockIndentWidth: 2
+AccessModifierOffset: -2
+InsertBraces: true
+AllowShortFunctionsOnASingleLine: Empty
+
+AlignConsecutiveMacros: true
+
+AlignConsecutiveAssignments:
+ Enabled: false
+ AcrossEmptyLines: false
+ AcrossComments: false
+ AlignCompound: true
+
+AlignConsecutiveDeclarations: false
+
+AllowShortEnumsOnASingleLine: false
+
+AlignAfterOpenBracket: AlwaysBreak
+BracedInitializerIndentWidth: 2
