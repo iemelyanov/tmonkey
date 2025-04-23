@@ -4,6 +4,7 @@
 #include "common.h"
 
 namespace tmonkey {
+
 class Codegen {
 public:
   void visit(const AstNode* n) {

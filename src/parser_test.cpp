@@ -6,13 +6,14 @@
 namespace tmonkey {
 namespace {
 
-#define TM_ASSERT_TREE(expected, prog)                          \
-  do {                                                          \
-    tmonkey::Arena arena;                                       \
-    std::vector<AstNode*> tree = tmonkey::parse((prog), arena); \
-    ASSERT_TRUE(tree.size() > 0);                               \
-    auto str = tmonkey::AstPrettyfier::prettify(tree);          \
-    ASSERT_EQ(expected, str);                                   \
+#define TM_ASSERT_TREE(expected, prog)                                     \
+  do {                                                                     \
+    tmonkey::StringInterningMap strintern;                                 \
+    tmonkey::Arena arena;                                                  \
+    std::vector<AstNode*> tree = tmonkey::parse((prog), strintern, arena); \
+    ASSERT_TRUE(tree.size() > 0);                                          \
+    auto str = tmonkey::AstPrettyfier::prettify(strintern, tree);          \
+    ASSERT_EQ(expected, str);                                              \
   } while (0)
 
 TEST(ParserTests, Integer) {
@@ -382,7 +383,103 @@ let fibo = fn(x) {
 
 puts(fibo(20));
 )""";
-  std::string expected = R"""()""";
+  std::string expected = R"""(Ast {
+.LetStmt {
+..Identifier: IdentifierExpr {
+...Value: fibo
+..}
+..Expr: FnExpr {
+...Params: [
+....IdentifierExpr {
+.....Value: x
+....}
+...]
+...Body: BlockStmt {
+....Body: [
+.....ExprStmt {
+......IfExpr {
+.......Cnd: InfixExpr {
+........Op: <=
+........Lhs: IdentifierExpr {
+.........Value: x
+........}
+........Rhs: IntegerExpr {
+.........Value: 1
+........}
+.......}
+.......Coseq: BlockStmt {
+........Body: [
+.........RetStmt {
+..........Expr: IdentifierExpr {
+...........Value: x
+..........}
+.........}
+........]
+.......}
+......}
+.....}
+.....RetStmt {
+......Expr: InfixExpr {
+.......Op: +
+.......Lhs: CallExpr {
+........Callable: IdentifierExpr {
+.........Value: fibo
+........}
+........Arguments: [
+.........InfixExpr {
+..........Op: -
+..........Lhs: IdentifierExpr {
+...........Value: x
+..........}
+..........Rhs: IntegerExpr {
+...........Value: 1
+..........}
+.........}
+........]
+.......}
+.......Rhs: CallExpr {
+........Callable: IdentifierExpr {
+.........Value: fibo
+........}
+........Arguments: [
+.........InfixExpr {
+..........Op: -
+..........Lhs: IdentifierExpr {
+...........Value: x
+..........}
+..........Rhs: IntegerExpr {
+...........Value: 2
+..........}
+.........}
+........]
+.......}
+......}
+.....}
+....]
+...}
+..}
+.}
+.ExprStmt {
+..CallExpr {
+...Callable: IdentifierExpr {
+....Value: puts
+...}
+...Arguments: [
+....CallExpr {
+.....Callable: IdentifierExpr {
+......Value: fibo
+.....}
+.....Arguments: [
+......IntegerExpr {
+.......Value: 20
+......}
+.....]
+....}
+...]
+..}
+.}
+}
+)""";
   TM_ASSERT_TREE(expected, prog);
 }
 

@@ -214,10 +214,10 @@ public:
 
 class IdentifierExpr final : public Expr {
 public:
-  IdentifierExpr(std::string_view identifier)
-      : Expr(Kind::kIdentifierExpr), identifier(identifier) {}
+  IdentifierExpr(size_t identifierIdx)
+      : Expr(Kind::kIdentifierExpr), identifierIdx{identifierIdx} {}
 
-  const std::string_view identifier;
+  const size_t identifierIdx;
 };
 
 class NullExpr final : public Expr {
@@ -248,9 +248,9 @@ public:
 
 class StrExpr final : public Expr {
 public:
-  StrExpr(std::string_view value) : Expr(Kind::kStrExpr), value{value} {}
+  StrExpr(size_t valueIdx) : Expr(Kind::kStrExpr), valueIdx{valueIdx} {}
 
-  const std::string_view value;
+  const size_t valueIdx;
 };
 
 class LetStmt final : public Stmt {

@@ -7,16 +7,17 @@ namespace tmonkey {
 
 class AstPrettyfier {
 public:
-  static auto prettify(const AstNode* n) -> std::string {
+  static auto prettify(const StringInterningMap& strintern, const AstNode* n) -> std::string {
     ASSERT_NO_NULLPTR(n);
 
-    AstPrettyfier p;
+    AstPrettyfier p(strintern);
     p.visit(n);
     return p.result_;
   }
 
-  static auto prettify(const std::vector<AstNode*> tree) -> std::string {
-    AstPrettyfier p;
+  static auto prettify(const StringInterningMap& strintern, const std::vector<AstNode*> tree)
+      -> std::string {
+    AstPrettyfier p(strintern);
     p.result_ += std::format("Ast {{\n");
     p.indent_++;
     for (auto* node : tree) {
@@ -29,6 +30,8 @@ public:
   }
 
 private:
+  AstPrettyfier(const StringInterningMap& strintern) : strintern_{strintern} {}
+
   void visit(const AstNode* n) {
     ASSERT_NO_NULLPTR(n);
 
@@ -41,6 +44,7 @@ private:
 
   int indent_ = 0;
   std::string result_;
+  const StringInterningMap& strintern_;
 };
 
 }  // namespace tmonkey

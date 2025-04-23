@@ -173,7 +173,11 @@ void AstPrettyfier::visitIdentifierExpr(const AstNode* n) {
 
   const auto* e = static_cast<const IdentifierExpr*>(n);
   result_ += std::format("IdentifierExpr {{\n");
-  result_ += std::format("{:.>{}}Value: {}\n", "", indent_, e->identifier);
+  if (auto v = strintern_.string(e->identifierIdx); v.has_value()) {
+    result_ += std::format("{:.>{}}Value: {}\n", "", indent_, *v);
+  } else {
+    result_ += std::format("{:.>{}}Value: ''\n", "", indent_);
+  }
   result_ += std::format("{:.>{}}}}\n", "", indent_ - 1);
 }
 
@@ -216,7 +220,11 @@ void AstPrettyfier::visitStrExpr(const AstNode* n) {
 
   const auto* e = static_cast<const StrExpr*>(n);
   result_ += std::format("StrExpr {{\n");
-  result_ += std::format("{:.>{}}Value: '{}'\n", "", indent_, e->value);
+  if (auto v = strintern_.string(e->valueIdx); v.has_value()) {
+    result_ += std::format("{:.>{}}Value: '{}'\n", "", indent_, *v);
+  } else {
+    result_ += std::format("{:.>{}}Value: ''\n", "", indent_);
+  }
   result_ += std::format("{:.>{}}}}\n", "", indent_ - 1);
 }
 

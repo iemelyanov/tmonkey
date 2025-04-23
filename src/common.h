@@ -86,7 +86,7 @@ public:
     return idx;
   }
 
-  auto string(size_t idx) -> std::optional<std::string_view> {
+  auto string(size_t idx) const -> std::optional<std::string_view> {
     if (idx >= vec_.size()) {
       return {};
     }

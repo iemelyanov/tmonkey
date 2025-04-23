@@ -5,6 +5,7 @@
 
 namespace tmonkey {
 
-auto parse(std::string_view source, Arena& arena) -> std::vector<AstNode*>;
+auto parse(std::string_view source, StringInterningMap& strintern, Arena& arena)
+    -> std::vector<AstNode*>;
 
 }  // namespace tmonkey

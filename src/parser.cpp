@@ -1,6 +1,7 @@
-#include "parser.h"
 #include <charconv>
+
 #include "lexer.h"
+#include "parser.h"
 
 namespace tmonkey {
 
@@ -48,7 +49,8 @@ auto precedence(Token::Kind kind) -> uint8_t {
 
 class Parser {
 public:
-  Parser(std::string_view source, Arena& arena) : arena_{arena}, lex_(source) {}
+  Parser(std::string_view source, StringInterningMap& strintern, Arena& arena)
+      : arena_{arena}, strintern_{strintern}, lex_(source) {}
 
   auto parse() -> std::vector<AstNode*>;
 
@@ -94,6 +96,7 @@ private:
 
 private:
   Arena& arena_;
+  StringInterningMap& strintern_;
   Lexer lex_;
   std::vector<std::string> errors_;
 
@@ -130,9 +133,10 @@ auto Parser::matchPeek(Token::Kind kind) -> bool {
     advance();
     return true;
   }
-  errors_.push_back(std::format(
-      "parser error: {} expected next token to be: {} got: {}", __func__, tokenKindStringify(kind),
-      tokenKindStringify(peekTok_.kind())));
+  errors_.push_back(
+      std::format(
+          "parser error: {} expected next token to be: {} got: {}", __func__,
+          tokenKindStringify(kind), tokenKindStringify(peekTok_.kind())));
   return false;
 }
 
@@ -376,7 +380,7 @@ auto Parser::parseHashMapExpr() -> HashMapExpr* {
 }
 
 auto Parser::parseIdentifierExpr() -> IdentifierExpr* {
-  return createNode<IdentifierExpr>(curTok_.text());
+  return createNode<IdentifierExpr>(strintern_.intern(curTok_.text()));
 }
 
 auto Parser::parseNullExpr() -> NullExpr* {
@@ -416,7 +420,7 @@ auto Parser::parseFloatExpr() -> FloatExpr* {
 }
 
 auto Parser::parseStrExpr() -> StrExpr* {
-  return createNode<StrExpr>(curTok_.text());
+  return createNode<StrExpr>(strintern_.intern(curTok_.text()));
 }
 
 auto Parser::parseGroupExpr() -> Expr* {
@@ -581,8 +585,9 @@ auto Parser::handleInfixExpr(Token::Kind kind, Expr* expr) -> Expr* {
   }
 }
 
-auto parse(std::string_view source, Arena& arena) -> std::vector<AstNode*> {
-  Parser parser(source, arena);
+auto parse(std::string_view source, StringInterningMap& strintern, Arena& arena)
+    -> std::vector<AstNode*> {
+  Parser parser(source, strintern, arena);
   return parser.parse();
 }
 
